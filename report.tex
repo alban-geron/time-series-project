@@ -1,7 +1,6 @@
 \documentclass[12pt]{article}
 \usepackage{amsmath,amssymb,enumerate,enumitem}%la base
 \usepackage{fancyhdr}%pour custom les en-têtes et pieds de page
-\usepackage{stmaryrd}%pour les crochets doubles
 \usepackage{xcolor}%pour les couleurs
 \usepackage[a4paper,lmargin=1cm,rmargin=1cm,tmargin=1cm,bmargin=2cm]{geometry}
 \usepackage[T1]{fontenc}
@@ -10,13 +9,18 @@
 \usepackage[most]{tcolorbox}%pour les encadrés
 \usepackage{import} % pour importer
 \usepackage{listings}%pour afficher du code R
+\usepackage[pages=some]{background} % pour la page de garde
+
+% --- Couleur violet thème ---
+\definecolor{ensae}{RGB}{71, 1, 125}
+
 \hypersetup{
     colorlinks=true,
-    linkcolor=orange,
+    linkcolor=ensae,
     filecolor=magenta,      
     urlcolor=cyan,
     pdfpagemode=FullScreen,
-    pdftitle = Colles Ginette 2024-25,
+    pdftitle = Linear Time Series Assignment,
     pdfauthor = Alban Géron
     }
 
@@ -62,9 +66,18 @@
 
 
 \begin{document}
+    \backgroundsetup{
+        scale = 1,
+        angle = 0,
+        opacity = 1,
+        contents = {
+            \includegraphics[width = \paperwidth, height = \paperheight, keepaspectratio]{bgcover.pdf}
+        }
+    }
+   \BgThispage
     \newgeometry{
-        lmargin=2cm,
-        rmargin=2cm,
+        lmargin=1cm,
+        rmargin=7cm,
         tmargin=4cm,
         bmargin=4cm
     }
@@ -77,8 +90,8 @@
         \Large\bfseries
         \begin{tcolorbox}[
             enhanced, sharp corners,
-            colback = orange!5!white,
-            colframe = orange!60!white,
+            colback = ensae!5!white,
+            colframe = ensae!60!white,
             drop fuzzy shadow = gray
         ]
             \centering {\huge\sffamily ARIMA modelling of a time series}
@@ -90,7 +103,7 @@
 
         \vskip4cm
 
-        Prepared by Alban \textsc{Géron} and Théo \textsc{Lartigau}
+        Alban \textsc{Géron} and Théo \textsc{Lartigau}
 
         \vskip0.5cm
 
