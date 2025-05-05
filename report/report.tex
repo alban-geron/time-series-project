@@ -15,14 +15,14 @@
 \definecolor{ensae}{RGB}{71, 1, 125}
 
 \hypersetup{
-    colorlinks=true,
-    linkcolor=ensae,
-    filecolor=magenta,      
-    urlcolor=cyan,
-    pdfpagemode=FullScreen,
+    colorlinks = true,
+    linkcolor = ensae,
+    filecolor = ensae,      
+    urlcolor = ensae,
+    pdfpagemode = FullScreen,
     pdftitle = Linear Time Series Assignment,
     pdfauthor = Alban Géron
-    }
+}
 
 \pagestyle{fancy}
 \lhead{} \rhead{} \lfoot{} \rfoot{}
@@ -62,6 +62,11 @@
 \titleformat{\section}{\normalfont\sffamily\bfseries\Large}{\thesection}{1em}{}
 \titleformat{\subsection}{\normalfont\sffamily\bfseries\large}{\thesubsection}{1em}{}
 \titleformat{\subsubsection}{\normalfont\sffamily\bfseries}{\thesubsubsection}{1em}{}
+\setlist[enumerate]{
+    font = \color{ensae!70!white}\sffamily,
+    leftmargin = *,
+    resume
+}
 
 
 
@@ -92,6 +97,7 @@
             enhanced, sharp corners,
             colback = ensae!5!white,
             colframe = ensae!60!white,
+            boxrule = 0.5pt,
             drop fuzzy shadow = gray
         ]
             \centering {\huge\sffamily ARIMA modelling of a time series}
@@ -113,9 +119,19 @@
     \newpage
     \restoregeometry
 
-    \section{Section}
+    \section{The data}
 
-    \subsection{Subsection}
+    \begin{enumerate}
+        \item The chosen series is the gross Industrial Production Index (IPI) for the manufacture of beverages\footnote{\url{https://www.insee.fr/fr/statistiques/serie/010767668}} --- that is, it tracks the monthly physical output of France’s drinks industry (breweries, wineries, distillers, soft‑drink plants and bottled‑water facilities). The index is expressed on a base‑$100$ scale with 2021 as the reference year, that is, a value of $110$ means the beverage industry produced $10 \%$ more than its 2021 average in that month.
 
-    Some text
+        Because the figures are labelled “gross,” they have not yet been corrected for working‑day or seasonal effects. The beverage sector is highly seasonal, with spikes around summer and year‑end celebrations. Therefore, seasonal adjustment may required before modelling.
+
+        Although the base‑$100$ scaling often keeps variance reasonably stable, a logarithmic transformation can be considered if larger index values display greater volatility.
+
+        Finally, an ordinary first difference may be needed to remove any remaining trend.
+    \end{enumerate}
+
+    % \section{ARMA models}
+
+    % \section{Prediction}
 \end{document}
