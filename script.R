@@ -81,3 +81,68 @@ coeftest(fit_bic)
 residuals_fit <- residuals(fit_bic)
 plot(residuals_fit)
 Box.test(residuals_fit, lag = 24, type = "Ljung-Box", fitdf = 2)
+
+
+# Joint confidence region for Y(t+1) and Y(t+2)
+
+fc <- forecast(fit_bic, h = 2)
+f1 <- as.numeric(fc$mean[1])
+f2 <- as.numeric(fc$mean[2])
+
+sigma2 <- fit_bic$sigma2
+phi    <- as.numeric(fit_bic$model$phi)
+theta  <- as.numeric(fit_bic$model$theta)
+
+# Compute the first MA weight for the stationary ARMA(1,1) on y_diff
+psi1 <- phi + theta
+
+# Variances and covariance of the 1-step and 2-step forecast errors for ΔY
+var1  <- sigma2 * (1 + theta^2)        # Var(e_{t+1})
+var2  <- sigma2 * (1 + psi1^2)         # Var(e_{t+2})
+cov12 <- sigma2 * psi1                 # Cov(e_{t+1}, e_{t+2})
+
+Sigma_d <- matrix(c(var1, cov12,
+                    cov12, var2),
+                  nrow = 2, byrow = TRUE)
+
+# Convert forecasts of ΔY into forecasts of Y
+y_last <- as.numeric(tail(y, 1))       # last observed Y_t
+mu_y1  <- y_last + f1                  # E[Y_{t+1}]
+mu_y2  <- y_last + f1 + f2             # E[Y_{t+2}]
+center <- c(mu_y1, mu_y2)
+
+# Transformation matrix
+A <- matrix(c(1, 0,
+              1, 1),
+            nrow = 2, byrow = TRUE)
+
+# Covariance matrix for the joint forecast error of (Y_{t+1}, Y_{t+2})
+Sigma_y <- A %*% Sigma_d %*% t(A)
+
+# Compute the points on the 95% confidence ellipse
+chisq_val <- qchisq(0.95, df = 2)
+eig <- eigen(Sigma_y)
+
+# Scale eigenvectors by sqrt(eigenvalues * khi2(0.95))
+transformation_matrix <- eig$vectors %*% diag(sqrt(eig$values * chisq_val))
+
+theta_seq <- seq(0, 2 * pi, length.out = 200)
+ellipse_coords <- t(sapply(theta_seq, function(t) {
+  center + transformation_matrix %*% c(cos(t), sin(t))
+}))
+
+ellipse_df <- data.frame(
+  Y_tp1 = ellipse_coords[, 1],
+  Y_tp2 = ellipse_coords[, 2]
+)
+
+# Plot the 95% confidence ellipse
+ggplot(ellipse_df, aes(x = Y_tp1, y = Y_tp2)) +
+  geom_path(color = "steelblue", size = 1) +
+  geom_point(aes(x = center[1], y = center[2]), color = "red", size = 2) +
+  labs(
+    x = expression(Y[t + 1]),
+    y = expression(Y[t + 2]),
+    title = ""
+  ) +
+  theme_minimal()

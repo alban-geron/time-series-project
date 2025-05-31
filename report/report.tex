@@ -70,11 +70,14 @@
 }
 
 % --- Macros ---
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\Var}{Var}
 \newcommand{\ARMA}{\textsf{ARMA}}
 \newcommand{\ARIMA}{\textsf{ARIMA}}
 \newcommand{\AIC}{\textsf{AIC}}
 \newcommand{\BIC}{\textsf{BIC}}
 \newcommand{\WN}{\textsf{WN}}
+\newcommand{\iidsim}{\overset{\text{i.i.d.}}{\sim}}
 
 
 
@@ -213,15 +216,15 @@
             \label{fig:autocorrelograms}
         \end{figure}
 
-        Figure \ref{fig:acf_ydiff} shows that the autocorrelations become non-significant beyond lag 13, while Figure \ref{fig:pacf_ydiff} show that the partial autocorrelations become non-significant beyond lag 7. Therefore, we seek for the best $\ARMA(p, q)$ for $p = 0, 1, \dots, 7$ and $q = 0, 1, \dots, 13$. To compare those models we find $(p_{\AIC}, q_{\AIC})$ minimizing $\AIC(p, q)$ and $(p_{\BIC}, q_{\BIC})$ minimizing $\BIC(p, q)$. The results of those two minimization programs, which can be found in Table \ref{tab:aic_bic_results}, suggest that the two best candidates are $\ARMA(4, 4)$ and $\ARMA(1, 1)$. We note that, in both models, there is only one coefficient that is not statistically significant (see Table \ref{tab:arma44_coeffs} and Table \ref{tab:arma11_coeffs}). Because we foster simplest models to prevent overfitting, we choose to fit the $\ARMA(1, 1)$ model on the series $(\nabla Y_t)$ in the following.
+        Figure \ref{fig:acf_ydiff} shows that the autocorrelations become non-significant beyond lag 13, while Figure \ref{fig:pacf_ydiff} shows that the partial autocorrelations become non-significant beyond lag 7. Therefore, we seek for the best $\ARMA(p, q)$ for $p = 0, 1, \dots, 7$ and $q = 0, 1, \dots, 13$. To compare those models we find $(p_{\AIC}, q_{\AIC}) \in \argmin_{(p, q)} \AIC(p, q)$ and $(p_{\BIC}, q_{\BIC}) \in \argmin_{(p, q)} \BIC(p, q)$. The results of those two minimization programs, which can be found in Table \ref{tab:aic_bic_results}, suggest that the two best candidates are $(p, q) = (4, 4)$ (minimizing the $\AIC$ criterion) and $(p, q) = (1, 1)$ (minimizing $\BIC$). We note that, in both models, there is only one coefficient that is not statistically significant (see Table \ref{tab:arma44_coeffs} and Table \ref{tab:arma11_coeffs}). Because we foster simplest models to prevent overfitting, we choose to fit the $\ARMA(1, 1)$ model on the series $(\nabla Y_t)$ in the following.
         %
         \begin{table}[ht]
             \centering
             \begin{tabular}{l|ccc}
-                \textbf{Criterion} & \textbf{Best Model} & $\AIC$ & $\BIC$ \\
+                \textbf{Criterion} & \textbf{Best $\ARMA(p, q)$ Model} & \textbf{$\AIC(p, q)$} & \textbf{$\BIC(p, q)$} \\
                 \hline
-                $\AIC$  & $\ARMA(4, 4)$ & 2417.044 & 2457.494 \\
-                $\BIC$  & $\ARMA(1, 1)$ & 2423.842 & 2440.022 
+                $\AIC$  & $(p, q) = (4, 4)$ & 2417.044 & 2457.494 \\
+                $\BIC$  & $(p, q) = (1, 1)$ & 2423.842 & 2440.022 
             \end{tabular}
             \caption{Minimization of $\AIC(p, q)$ and $\BIC(p, q)$}
             \label{tab:aic_bic_results}
@@ -259,7 +262,7 @@
             \label{tab:arma11_coeffs}
         \end{table}
 
-        To check the validity of the model we want to test whether the residual $(\varepsilon_t)$ is a white noise or not. Plotting the residuals (see Figure \ref{fig:plot_residuals}) show that it seems that it is a white noise, i.e. a zero-mean, time-independant-variance and uncorrelated sequence. To test that the residuals are uncorrelated, we use the Ljung-box test (see Table \ref{tab:ljung_box}) which accepts the null hypothesis of non-autocorrelation of the residuals at the $5 \%$ level.
+        To check the validity of the model we want to test whether the residual $(\varepsilon_t)$ is a white noise or not. Plotting the residuals (see Figure \ref{fig:plot_residuals}) show that it seems that it is a white noise, i.e. a zero-mean, time-independant-variance and uncorrelated sequence of random variables. To test that the residuals are uncorrelated, we use the Ljung-box test (see Table \ref{tab:ljung_box}) which accepts the null hypothesis of non-autocorrelation of the residuals at the $5 \%$ level.
         %
         \begin{figure}[h]
             \centering
@@ -281,7 +284,7 @@
 
         To conclude, we have picked the $\ARMA(1, 1)$ model for the series $(\nabla Y_t)$. It is valid because we have tested both the stationarity of $(\nabla Y_t)$ and the fact that the residual is a white noise.
 
-        \item We have $(\nabla Y_t) \sim \ARMA(1, 1)$, thus $(Y_t) \sim \ARIMA(1, 1, 1)$ with the coefficient estimated in Table \ref{tab:arma11_coeffs}:
+        \item We have $(\nabla Y_t) \sim \ARMA(1, 1)$, thus $(Y_t) \sim \ARIMA(1, 1, 1)$ with the coefficients estimated in Table \ref{tab:arma11_coeffs}:
         %
         \[\nabla Y_t = 0.0310 + 0.4253 \nabla Y_{t - 1} - 0.8458 \varepsilon_{t - 1} + \varepsilon_t, \qquad (\varepsilon_t) \sim \WN(0, \sigma^2)\]
     \end{enumerate}
@@ -289,6 +292,249 @@
     \section{Prediction}
 
     \begin{enumerate}
-        \item 
+        \item Let $\phi$ and $\theta$ the coefficients predicted by $\hat\phi=-0.4253$ and $\hat\theta=-0.8458$. We have $|\hat\phi|<1$ and $|\hat\theta|<1$, thus, the $\ARMA(1,1)$ model for $(\nabla Y_t)$ has the following canonical representation:
+        %
+        \[\nabla Y_t - \phi \nabla Y_{t-1} = \varepsilon_t - \theta\varepsilon_{t-1}\]
+
+        Where $\varepsilon_t$ is the linear innovation of the model. Thus:
+        %
+        \begin{equation} \label{innov}
+        \mathbb{E}[\varepsilon_{t+h}|\mathcal{F}_t]=0, \qquad \forall h > 0
+        \end{equation}
+
+        The canonical representation gives us:
+        %
+        \begin{equation} \label{nabla}
+        \begin{cases}
+            \nabla Y_{t+1}=\phi\nabla Y_t - \theta\varepsilon_t + \varepsilon_{t+1} \\
+            \nabla Y_{t+2} = \phi(\phi\nabla Y_t -\theta\varepsilon_t) + (\phi - \theta)\varepsilon_{t+1} + \varepsilon_{t+2}
+        \end{cases}
+        \end{equation}
+
+        Letting $\widehat{\nabla Y}_{t+1|t} = \mathbb{E}[\nabla Y_{t+1}|\mathcal{F}_t]$ and $\widehat{\nabla Y}_{t+2|t} = \mathbb{E}[\nabla Y_{t+2}|\mathcal{F}_t]$, \eqref{innov} gives us:
+
+        \begin{equation} \label{nablahat}
+        \begin{cases}
+            \widehat{\nabla Y}_{t+1}=\phi\nabla Y_t - \theta\varepsilon_t \\
+            \widehat{\nabla Y}_{t+2} = \phi(\phi\nabla Y_t -\theta\varepsilon_t)
+        \end{cases}
+        \end{equation}
+
+        Then, subtracting \eqref{nablahat} from \eqref{nabla} gives:
+
+        \begin{equation} \label{nablaerr}
+        \begin{cases}
+            \nabla Y_{t+1} - \widehat{\nabla Y}_{t+1} = \varepsilon_{t+1} \\
+            \nabla Y_{t+2} - \widehat{\nabla Y}_{t+2} = (\phi -\theta)\varepsilon_{t+1} + \varepsilon_{t+2}
+        \end{cases}
+        \end{equation}
+
+        The predictions are given by the following relations:
+        %
+        \begin{equation} \label{forecast}            
+        \begin{cases}
+            \widehat{Y}_{t+1|t}=\widehat{\nabla Y}_{t+1|t} + Y_t \\
+            \widehat{Y}_{t+2|t}=\widehat{\nabla Y}_{t+2|t} + Y_{t+1}
+        \end{cases}
+        \end{equation}
+        
+        Given $\nabla Y_{t+1} = Y_{t+1}-Y_t$ and the first lines of \eqref{nablaerr} and \eqref{forecast}, we obtain the prediction error at $t+1$:
+        %
+        \[ e_1 = Y_{t+1}-\widehat{Y}_{t+1|t}=\nabla Y_{t+1} - \widehat{\nabla Y}_{t+1|t} = \varepsilon_{t+1} \]
+
+        Then, $\nabla Y_{t+2} = Y_{t+2} - Y_{t+1}$ and the second lines of \eqref{nablaerr} and \eqref{forecast} gives us the prediction error at $t+2$:
+        %
+        \[ e_2 = Y_{t+2} - \widehat{Y}_{t+2|t} = \nabla Y_{t+2} - \widehat{\nabla Y}_{t+2|t} = (\phi -\theta)\varepsilon_{t+1} + \varepsilon_{t+2} \]
+
+        Knowing that $(\varepsilon_t) \sim \WN(0, \sigma^2)$, the prediction error covariance matrix is given by:
+        %
+        \[\Sigma = \Var\begin{pmatrix} e_1 \\ e_2\end{pmatrix} = \sigma^2\begin{pmatrix}
+            1 & 1 + \phi - \theta \\
+            1 + \phi - \theta & 1 + (1 + \phi - \theta)^2
+        \end{pmatrix} \]
+
+        Assuming that $(\varepsilon_t) \iidsim \mathcal{N}(0, \sigma^2)$, we then have a confidence region of level $\alpha$ given by the following relations:
+        %
+        \begin{align*}
+            1-\alpha&=\mathbb{P}\left(Y_{t+1}\in\left[\widehat{Y}_{t+1|t} - q_{1-\alpha}\hat\sigma, \widehat{Y}_{t+1|t} + q_{1-\alpha}\hat\sigma\right]\right) \\
+            1-\alpha&=\mathbb{P}\left(Y_{t+2}\in\left[\widehat{Y}_{t+2|t} - q_{1-\alpha}\hat\sigma \sqrt{ 1 + (1 + \phi - \theta)^2}, \widehat{Y}_{t+2|t} + q_{1-\alpha}\hat\sigma \sqrt{ 1 + (1 + \phi - \theta)^2}\right]\right)
+        \end{align*}
+
+        \item To obtain this confidence region, we assumed:
+        \begin{itemize}
+            \item Our $\ARMA(1,1)$ model being well specified.
+            \item $(\varepsilon_t) \iidsim \mathcal{N}(0, \sigma^2)$
+            \item $\widehat{Y}_{t+1}$ and $\widehat{Y}_{t+2}$ being consistent
+        \end{itemize}
+
+        \item The 95\% confidence region is represented in Figure \ref{fig:confidence_region}. We have $\begin{pmatrix} \widehat{Y}_{t+1|t} \\ \widehat{Y}_{t+2|t}\end{pmatrix} = 
+        \begin{pmatrix} 102.23 \\ 99.99\end{pmatrix}$.
+        %
+        \begin{figure}[h]
+            \centering
+            \includegraphics[width=0.9\linewidth]{plot region.png}
+            \caption{Confidence region of $(Y_{t+1},Y_{t+2})$ for $\alpha=95\%$}
+            \label{fig:confidence_region}
+        \end{figure}
+
+        \item Let $(X_t)$ and $(Y_t)$ two time series with $(Y_t)$ assumed to be stationary. We observe $Y_{t+1}$ before $X_{t+1}$. This helps us improve the prediction of $X_{t+1}$ if and only if $(Y_t)$ causes $(X_t)$ instantaneously in the Granger sense, that is:
+        %
+        \[\mathbb{E}[X_{t+1}|\mathcal{F}_t,Y_{t+1}] \neq \mathbb{E}[X_{t+1}|\mathcal{F}_t]\]
+
+        This is the case when the prediction errors of $(X_t)$ and $(Y_t)$ are correlated. Such an hypothesis can be tested by building an autoregressive vector model (VAR) of the joint distribution of $(X_t)$ and $(Y_t)$ and implementing a Wald test on the least squares estimated coefficients of said VAR model.
+        
     \end{enumerate}
+
+    \section{Appendix: source code}
+
+    \begin{lstlisting}[language=R]
+    # --- Packages & imports ---
+
+    library(tseries)
+    library(readr)
+    library(tsibble)
+    library(lubridate)
+    library(ggplot2)
+    library(forecast)
+    library(patchwork)
+    library(dplyr)
+    library(lmtest)
+    library(zoo)
+    
+    # Processing data
+    raw <- read_delim(
+      "data.csv",
+      delim = ";",
+      col_names = FALSE,
+      show_col_types = FALSE
+    )
+    raw_month <- raw[ grepl("^\\d{4}-\\d{2}$", raw$X1) , ]
+    min_date <- ymd(paste0(tail(raw_month$X1, 1), "-01")) # 1990-01-01
+    y <- ts(
+      rev(as.numeric(raw_month$X2)),
+      start = c(year(min_date), month(min_date)),
+      frequency = 12
+    )
+    
+    plot(y)
+    
+    # Testing stationarity
+    adf.test(y)
+    pp.test(y)
+    kpss.test(y)
+    
+    # Testing stationarity on first-order differenced series
+    y_diff <- diff(y)
+    plot(y_diff)
+    adf.test(y_diff)
+    pp.test(y_diff)
+    kpss.test(y_diff)
+    
+    # Plot autocorrelation and partial autocorrelation of the differenced series
+    acf(zoo(coredata(y_diff)), plot = TRUE, main = 'ACF of the differenced series')
+    pacf(zoo(coredata(y_diff)), plot = TRUE, main = 'PACF of the differenced series')
+    
+    # AIC and BIC minimization
+    max_p <- 7
+    max_q <- 13
+    results <- data.frame(p = integer(), q = integer(), AIC = numeric(), BIC = numeric())
+    for (p in 0:max_p) {
+      for (q in 0:max_q) {
+        cat("Fitting ARMA(", p, ",", q, ")...\n")
+        try({
+          model <- Arima(y_diff, order = c(p, 0, q), include.mean = TRUE)
+          results <- rbind(results, data.frame(
+            p = p,
+            q = q,
+            AIC = AIC(model),
+            BIC = BIC(model)
+          ))
+        }, silent = TRUE)
+      }
+    }
+    best_aic <- results[which.min(results$AIC), ]
+    best_bic <- results[which.min(results$BIC), ]
+    print("Best model according to AIC:")
+    print(best_aic) # ---> ARMA(4, 4)
+    print("Best model according to BIC:")
+    print(best_bic) # ---> ARMA(1, 1)
+    
+    # Significance of the coefficients in ARMA(4, 4) and ARMA(1, 1)
+    fit_aic <- Arima(y_diff, order = c(4, 0, 4))
+    fit_aic
+    coeftest(fit_aic)
+    fit_bic <- Arima(y_diff, order = c(1, 0, 1))
+    fit_bic
+    coeftest(fit_bic)
+    
+    # Uncorrelation test on the residuals of ARMA(1, 1)
+    residuals_fit <- residuals(fit_bic)
+    plot(residuals_fit)
+    Box.test(residuals_fit, lag = 24, type = "Ljung-Box", fitdf = 2)
+    
+    
+    # Joint confidence region for Y(t+1) and Y(t+2)
+    
+    fc <- forecast(fit_bic, h = 2)
+    f1 <- as.numeric(fc$mean[1])
+    f2 <- as.numeric(fc$mean[2])
+    
+    sigma2 <- fit_bic$sigma2
+    phi    <- as.numeric(fit_bic$model$phi)
+    theta  <- as.numeric(fit_bic$model$theta)
+    
+    # Compute the first MA weight for the stationary ARMA(1,1) on y_diff
+    psi1 <- phi + theta
+    
+    # Variances and covariance of the 1-step and 2-step forecast errors for ΔY
+    var1  <- sigma2 * (1 + theta^2)        # Var(e_{t+1})
+    var2  <- sigma2 * (1 + psi1^2)         # Var(e_{t+2})
+    cov12 <- sigma2 * psi1                 # Cov(e_{t+1}, e_{t+2})
+    
+    Sigma_d <- matrix(c(var1, cov12,
+                        cov12, var2),
+                      nrow = 2, byrow = TRUE)
+    
+    # Convert forecasts of ΔY into forecasts of Y
+    y_last <- as.numeric(tail(y, 1))       # last observed Y_t
+    mu_y1  <- y_last + f1                  # E[Y_{t+1}]
+    mu_y2  <- y_last + f1 + f2             # E[Y_{t+2}]
+    center <- c(mu_y1, mu_y2)
+    
+    # Transformation matrix
+    A <- matrix(c(1, 0,
+                  1, 1),
+                nrow = 2, byrow = TRUE)
+    
+    # Covariance matrix for the joint forecast error of (Y_{t+1}, Y_{t+2})
+    Sigma_y <- A %*% Sigma_d %*% t(A)
+    
+    # Compute the points on the 95% confidence ellipse
+    chisq_val <- qchisq(0.95, df = 2)
+    eig <- eigen(Sigma_y)
+    
+    # Scale eigenvectors by sqrt(eigenvalues * khi2(0.95))
+    transformation_matrix <- eig$vectors %*% diag(sqrt(eig$values * chisq_val))
+    
+    theta_seq <- seq(0, 2 * pi, length.out = 200)
+    ellipse_coords <- t(sapply(theta_seq, function(t) {
+      center + transformation_matrix %*% c(cos(t), sin(t))
+    }))
+    
+    ellipse_df <- data.frame(
+      Y_tp1 = ellipse_coords[, 1],
+      Y_tp2 = ellipse_coords[, 2]
+    )
+    
+    # Plot the 95% confidence ellipse
+    ggplot(ellipse_df, aes(x = Y_tp1, y = Y_tp2)) +
+      geom_path(color = "steelblue", size = 1) +
+      geom_point(aes(x = center[1], y = center[2]), color = "red", size = 2) +
+      labs(
+        x = expression(Y[t + 1]),
+        y = expression(Y[t + 2]),
+        title = ""
+      ) +
+      theme_minimal()
+    \end{lstlisting}
 \end{document}
